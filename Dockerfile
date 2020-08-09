@@ -1,7 +1,7 @@
 # ARG ubuntu_version=16.04
 #FROM ubuntu:${ubuntu_version}
 #Use ubuntu 18:04 as your base image
-FROM centos:centos7
+FROM ubuntu:10.04
 #Any label to recognise this image.
 #LABEL image=Spark-base-image
 ENV SPARK_VERSION 2.4.5
@@ -10,7 +10,7 @@ ENV NB_USER=nbuser
 ENV NB_UID=1011
 #Run the following commands on my Linux machine
 #install the below packages on the ubuntu image
-RUN yum -y update && yum -y install gnupg2 wget java-1.8.0-openjdk java-1.8.0-openjdk-devel scala
+RUN apt-get update -y && apt-get install -y gnupg2 wget java-1.8.0-openjdk java-1.8.0-openjdk-devel scala
 #Download the Spark binaries from the repo
 
 # RUN wget --no-verbose http://www.gtlib.gatech.edu/pub/apache/spark/spark-2.4.1/spark-2.4.1-bin-hadoop2.7.tgz
