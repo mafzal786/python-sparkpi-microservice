@@ -43,6 +43,8 @@ USER $NB_UID
 
 COPY . /app
 
-ENTRYPOINT [ "python" ]
+#ENTRYPOINT [ "python" ]
 
-CMD [ "app.py" ]
+#CMD [ "app.py" ]
+ENTRYPOINT ["tail", "-f", "/dev/null"]
+
