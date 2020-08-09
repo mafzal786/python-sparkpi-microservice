@@ -1,7 +1,7 @@
 # ARG ubuntu_version=16.04
 #FROM ubuntu:${ubuntu_version}
 #Use ubuntu 18:04 as your base image
-FROM ubuntu:10.04
+FROM ubuntu:16.04
 #Any label to recognise this image.
 #LABEL image=Spark-base-image
 ENV SPARK_VERSION 2.4.5
