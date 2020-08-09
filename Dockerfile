@@ -10,7 +10,7 @@ ENV NB_USER=nbuser
 ENV NB_UID=1011
 #Run the following commands on my Linux machine
 #install the below packages on the ubuntu image
-RUN apt-get update -y && apt-get install -y gnupg2 wget java-1.8.0-openjdk java-1.8.0-openjdk-devel scala
+RUN apt-get update -y && apt-get install -y gnupg2 wget openjdk-8-jre scala python-pip
 #Download the Spark binaries from the repo
 
 # RUN wget --no-verbose http://www.gtlib.gatech.edu/pub/apache/spark/spark-2.4.1/spark-2.4.1-bin-hadoop2.7.tgz
@@ -22,6 +22,7 @@ RUN mv spark-2.4.5-bin-hadoop2.7 /opt/spark
 ENV SPARK_HOME /opt/spark
 ENV PATH $PATH:${SPARK_HOME}/bin
 
+RUN pip install -r requirements.txt
 #Expose the UI Port 4040
 
 
