@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+  <head>
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+<script type="text/javascript">
+	var canvas;
+    var context;
+    var canvasWidth = 200;
+    var canvasHeight = 200;
+    var scaledCanvas;
+    var scaledContext;
+    var scaledWidth = 28;
+    var scaledHeight = 28;
+
+    var clickX = new Array();
+    var clickY = new Array();
+    var clickDrag = new Array();
+    var paint = false;
+
+	function prepareSimpleCanvas()
+    {
+
+    	// Create the canvas (Neccessary for IE because it doesn't know what a canvas element is)
+    	var canvasDiv = document.getElementById('canvasSimpleDiv');
+    	canvas = document.createElement('canvas');
+    	canvas.setAttribute('width', canvasWidth);
+    	canvas.setAttribute('height', canvasHeight);
+    	canvas.setAttribute('style', 'cursor:pointer; border:solid 1px #DDD');
+    	canvas.setAttribute('id', 'canvasSimple');
+    	canvasDiv.appendChild(canvas);
+
+    	if(typeof G_vmlCanvasManager != 'undefined') {
+    		canvas = G_vmlCanvasManager.initElement(canvas);
+    	}
+
+
+    	context = canvas.getContext("2d");
+
+    	//var offset = $('#canvasSimple').offset();
+
+
+    	// Add mouse events
+    	// ----------------
+    	$('#canvasSimple').mousedown(function(e){
+    		// Mouse down location
+
+    		var mouseX = e.pageX - this.offsetLeft;
+    		var mouseY = e.pageY - this.offsetTop;
+
+    		paint = true;
+    		addClickSimple(mouseX, mouseY, false);
+    		redrawSimple();
+    	});
+
+    	$('#canvasSimple').mousemove(function(e){
+    		if(paint){
+    			addClickSimple(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+    			redrawSimple();
+    		}
+    	});
+
+    	$('#canvasSimple').mouseup(function(e){
+    		paint = false;
+    	  	redrawSimple();
+    	});
+
+    	$('#canvasSimple').mouseleave(function(e){
+    		paint = false;
+    	});
+
+    	$('#clearCanvas').mousedown(function(e)
+    	{
+    		clickX = new Array();
+    		clickY = new Array();
+    		clickDrag = new Array();
+    		clearCanvas();
+    	});
+
+    	$('#convertToArray').mousedown(function(e)
+    	{
+    	    var pixels = new Array();
+
+            // Create hidden canvas to draw 28*28 scaled image
+            scaledCanvas = document.createElement('canvas');
+            scaledCanvas.setAttribute('width', scaledWidth);
+            scaledCanvas.setAttribute('height', scaledHeight);
+            scaledCanvas.setAttribute('style', 'display: none;');
+            scaledCanvas.setAttribute('id', 'scaledCanvas');
+            canvasDiv.appendChild(scaledCanvas);
+            if(typeof G_vmlCanvasManager != 'undefined') {
+    		    scaledCanvas = G_vmlCanvasManager.initElement(scaledCanvas);
+    	    }
+    	    scaledContext = scaledCanvas.getContext("2d");
+    	    scaledContext.drawImage(canvas, 0, 0, scaledWidth, scaledHeight);
+
+            var uint8 = scaledContext.getImageData(0, 0, scaledWidth, scaledHeight).data;
+
+            // convert rgba data to pixel float
+    	    for (var i = 0; i < uint8.length; i += 4) {
+                pixels.push(uint8[i + 3]/255.0);
+            }
+
+            // display result pixel array in textarea
+            document.getElementById('array').value = pixels;
+    	});
+
+    	// Add touch event listeners to canvas element
+    	canvas.addEventListener("touchstart", function(e)
+    	{
+    		// Mouse down location
+    		var mouseX = (e.changedTouches ? e.changedTouches[0].pageX : e.pageX) - offset.left,
+    			mouseY = (e.changedTouches ? e.changedTouches[0].pageY : e.pageY) - offset.top;
+
+    		paint = true;
+    		addClickSimple(mouseX, mouseY, false);
+    		redrawSimple();
+    	}, false);
+    	canvas.addEventListener("touchmove", function(e){
+
+    		var mouseX = (e.changedTouches ? e.changedTouches[0].pageX : e.pageX) - offset.left,
+    			mouseY = (e.changedTouches ? e.changedTouches[0].pageY : e.pageY) - offset.top;
+
+    		if(paint){
+    			addClickSimple(mouseX, mouseY, true);
+    			redrawSimple();
+    		}
+    		e.preventDefault()
+    	}, false);
+    	canvas.addEventListener("touchend", function(e){
+    		paint = false;
+    	  	redrawSimple();
+    	}, false);
+    	canvas.addEventListener("touchcancel", function(e){
+    		paint = false;
+    	}, false);
+    }
+
+
+    function addClickSimple(x, y, dragging)
+    {
+    	clickX.push(x);
+    	clickY.push(y);
+    	clickDrag.push(dragging);
+    }
+
+    function clearCanvas()
+    {
+    	context.clearRect(0, 0, canvasWidth, canvasHeight);
+    }
+
+    function redrawSimple() {
+    	clearCanvas();
+
+    	var radius = 10;
+    	context.strokeStyle = "#000000";
+    	context.lineJoin = "round";
+    	context.lineWidth = radius;
+
+    	for(var i=0; i < clickX.length; i++)
+    	{
+    		context.beginPath();
+    		if(clickDrag[i] && i){
+    			context.moveTo(clickX[i-1], clickY[i-1]);
+    		}else{
+    			context.moveTo(clickX[i]-1, clickY[i]);
+    		}
+    		context.lineTo(clickX[i], clickY[i]);
+    		context.closePath();
+    		context.stroke();
+    	}
+    }
+
+    function copyToClipboard(elementId) {
+        var input = document.createElement("input");
+        input.setAttribute("value", document.getElementById(elementId).value);
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        document.body.removeChild(input);
+        alert("Copied! Put this value to below inputbox using Ctrl + V.");
+    }
+
+
+    </script>
+</head>
+<body onload="prepareSimpleCanvas();">
+<div class="row" style="padding-bottom: 5px">
+        <div class="col-md-1"></div>
+        <div  class="col-md-2">
+        <label for="comment">Draw you Number:</label><br>
+            <div class="form-group" id="canvasSimpleDiv"></div>
+
+
+            <div>
+                <button class="btn btn-default btn-xs" id="clearCanvas">Clear</button>
+                <button class="btn btn-default btn-xs btn-primary" id="convertToArray">Convert</button>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="form-group"><br>
+                <label for="comment">Digit Image Pixel Array:</label><br>
+                <textarea readonly id="array" class="form-control" rows="5" style="width:500px;"></textarea>
+				<br>
+            <button class="btn btn-default btn-xs" onclick="copyToClipboard('array')">Copy Image Pixel Array in Clipboard</button>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+    <code>Note: If you cannot draw anything on canvas, make change in the code (for example, add space) and rerun it!</code>
+
+</body>
+</html>
