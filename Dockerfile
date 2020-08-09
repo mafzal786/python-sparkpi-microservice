@@ -22,22 +22,27 @@ RUN mv spark-2.4.5-bin-hadoop2.7 /opt/spark
 ENV SPARK_HOME /opt/spark
 ENV PATH $PATH:${SPARK_HOME}/bin
 
-RUN pip install -r requirements.txt
+COPY ./requirements.txt /app/requirements.txt
+
 #Expose the UI Port 4040
+WORKDIR /app
+RUN pip install -r requirements.txt
+
+#ENV TINI_VERSION v0.19.0
+#ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+#RUN chmod +x /tini
 
 
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
-
-
-EXPOSE 4040
+#EXPOSE 4040
 
 ENV HOME /home/$NB_USER
 USER $NB_UID
 
 
-WORKDIR $SPARK_HOME
+# WORKDIR $SPARK_HOME
 
-# ENTRYPOINT ["/tini", "--"]
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+COPY . /app
+
+ENTRYPOINT [ "python" ]
+
+CMD [ "app.py" ]
