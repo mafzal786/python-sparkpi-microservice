@@ -33,7 +33,7 @@ RUN pip install -r requirements.txt
 #RUN chmod +x /tini
 
 
-#EXPOSE 4040
+EXPOSE 8080
 
 ENV HOME /home/$NB_USER
 USER $NB_UID
@@ -43,8 +43,8 @@ USER $NB_UID
 
 COPY . /app
 
-#ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "python" ]
 
-#CMD [ "app.py" ]
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+CMD [ "app.py" ]
+#ENTRYPOINT ["tail", "-f", "/dev/null"]
 
